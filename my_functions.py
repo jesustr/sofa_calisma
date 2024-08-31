@@ -419,7 +419,7 @@ def corner(
             multiplier += 1
             x_shift = 0.4
         ax[0,2].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-        ax[0,2].set_title(f'Rayo Son 10 Home Maci Korner Kick Period = {period}')
+        ax[0,2].set_title(f'{team_home} Son 10 Home Maci Korner Kick Period = {period}')
         ax[0,2].set_ylabel('Count')
         ax[0,2].set_ylim(0, df_aralarinda_corner['corner_kick_total_secondhalf'].max() + 3) 
         ax[0,2].set_xticks(x_length + width + x_shift )
@@ -1115,7 +1115,7 @@ def shoot_on_target(
             multiplier += 1
             x_shift = 0.4
         ax[0,2].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-        ax[0,2].set_title(f'Rayo Son 10 Home Maci Shoot On Target Period = {period}')
+        ax[0,2].set_title(f'{team_home} Son 10 Home Maci Shoot On Target Period = {period}')
         ax[0,2].set_ylabel('Count')
         ax[0,2].set_ylim(0, df_aralarinda_shoot['shots_on_target_total_secondhalf'].max() + 3) 
         ax[0,2].set_xticks(x_length + width + x_shift )
