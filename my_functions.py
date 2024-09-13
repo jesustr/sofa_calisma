@@ -37,11 +37,12 @@ def corner(
     pd.set_option('display.width', None)
     import matplotlib.gridspec as gridspec
     df_all = pd.read_csv('/Users/icy/sofascore/sofa_calisma/csvler/last_df.csv', parse_dates=['date'])
-    df = df_all[['date','org_detay','ulke','home_team','away_team','home_goal','away_goal','corner_kick_total','corner_kicks_home','corner_kicks_away','corner_kick_total_firsthalf','corner_kicks_home_firsthalf',
-    'corner_kicks_away_firsthalf','corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf','season_period','place_away','place_home','match_round']]
+    df = df_all[['date','org_detay','ulke','home_team','away_team','home_goal','away_goal','corner_kick_total','corner_kicks_home','corner_kicks_away','corner_kick_total_firsthalf',
+    'corner_kicks_home_firsthalf','home_iy_goal','away_iy_goal','home_sh_goal','away_sh_goal','corner_kicks_away_firsthalf','corner_kick_total_secondhalf','corner_kicks_home_secondhalf',
+    'corner_kicks_away_secondhalf','red_cards_firsthalf_total','red_cards_secondhalf_total','season_period','place_away','place_home','red_cards_total','match_round']]
     df = df[~(df.ulke == 'Europe')]
     fig, ax = plt.subplots(2,3,figsize = (21,9), layout='tight') 
-    #------ax[0,0]------  ARALARINDAKI KORNER ------------
+   #------ax[0,0]------  ARALARINDAKI KORNER ------------
     df_aralarinda_corner_all = df[(df.home_team.str.contains(home_team)) & (df.away_team.str.contains(away_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df[(df.home_team.str.contains(home_team)) & (df.away_team.str.contains(away_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total','corner_kicks_home','corner_kicks_away']][:10]
@@ -51,118 +52,144 @@ def corner(
     width = 0.25  # the width of the bars
     multiplier = 0
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
+    home_goal = list(df_aralarinda_corner_all['home_goal'][:10])
+    away_goal = list(df_aralarinda_corner_all['away_goal'][:10])
+    red_card = list(df_aralarinda_corner_all['red_cards_total'][:10])
+    xticks_labels = [f"{date}\nFT: {home_goal} - {away_goal} / R: {red_card}" for date, home_goal, away_goal, red_card in zip(corner_dates, home_goal, away_goal, red_card)]
     x_length = np.arange(len(corner_dates))
+
     for column in df_aralarinda_corner.columns : 
         offset = width * multiplier
         rects = ax[0,0].bar(x_length + offset, df_aralarinda_corner[column], width, label = column)
         ax[0,0].bar_label(rects, padding=3)
+            # Resmi barların üstüne ekle
         multiplier += 1
+
     ax[0,0].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-    ax[0,0].set_title(f'{team_home} - {team_away} Corner Kick' )
+    ax[0,0].set_title(f'{team_home} - {team_away} Corner Kick (FT= Full Time, R= Red)' )
     ax[0,0].set_ylabel('Count')
     ax[0,0].set_ylim(0, df_aralarinda_corner['corner_kick_total'].max() + 3) 
-    ax[0,0].set_xticks(x_length + width )
-    ax[0,0].set_xticklabels(corner_dates, rotation= 45, ha= 'right', fontsize= 7)
+    ax[0,0].set_xticks(x_length + width)
+    ax[0,0].set_xticklabels(xticks_labels, rotation= 45, ha= 'right', fontsize= 7)
     #------ax[0,1]------  ARALARINDAKI KORNER FIRST HALF ------------
     df_aralarinda_corner_all = df[(df.home_team.str.contains(home_team)) & (df.away_team.str.contains(away_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df[(df.home_team.str.contains(home_team)) & (df.away_team.str.contains(away_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_firsthalf','corner_kicks_home_firsthalf','corner_kicks_away_firsthalf']][:10]
-    corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
-    x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
+    home_iy_goal = list(df_aralarinda_corner_all['home_iy_goal'][:10])
+    away_iy_goal = list(df_aralarinda_corner_all['away_iy_goal'][:10])
+    red_cards_firsthalf = list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:10])
+    xticks_labels = [f"{date}\nHT: {home_iy_goal} - {away_iy_goal} / R: {red_card}" for date, home_iy_goal, away_iy_goal, red_card in zip(corner_dates, home_iy_goal, away_iy_goal, red_cards_firsthalf)]
+    x_length = np.arange(len(corner_dates))
     for column in df_aralarinda_corner.columns : 
         offset = width * multiplier
         rects = ax[0,1].bar(x_length + offset, df_aralarinda_corner[column], width, label = column)
         ax[0,1].bar_label(rects, padding=3)
         multiplier += 1
     ax[0,1].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-    ax[0,1].set_title(f'{team_home} - {team_away} First Half Corner Kick' )
+    ax[0,1].set_title(f'{team_home} - {team_away} First Half Corner Kick (HT= Half Time)')
     ax[0,1].set_ylabel('Count')
     ax[0,1].set_ylim(0, df_aralarinda_corner['corner_kick_total_firsthalf'].max() + 3) 
     ax[0,1].set_xticks(x_length + width )
-    ax[0,1].set_xticklabels(corner_dates, rotation= 45, ha= 'right', fontsize= 7)
+    ax[0,1].set_xticklabels(xticks_labels, rotation= 45, ha= 'right', fontsize= 7)
     #------ax[0,2]------  ARALARINDAKI KORNER SECOND HALF ------------
     df_aralarinda_corner_all = df[(df.home_team.str.contains(home_team)) & (df.away_team.str.contains(away_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df[(df.home_team.str.contains(home_team)) & (df.away_team.str.contains(away_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf']][:10]
-    corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
-    x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
+    home_sh_goal = list(df_aralarinda_corner_all['home_sh_goal'][:10])
+    away_sh_goal = list(df_aralarinda_corner_all['away_sh_goal'][:10])
+    red_cards_secondhalf = list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:10])
+    xticks_labels = [f"{date}\nST: {home_sh_goal} - {away_sh_goal} / R: {red_card}" for date, home_sh_goal, away_sh_goal, red_card in zip(corner_dates, home_sh_goal, away_sh_goal, red_cards_secondhalf)]
+    x_length = np.arange(len(corner_dates))
     for column in df_aralarinda_corner.columns : 
         offset = width * multiplier
         rects = ax[0,2].bar(x_length + offset, df_aralarinda_corner[column], width, label = column)
         ax[0,2].bar_label(rects, padding=3)
         multiplier += 1
     ax[0,2].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-    ax[0,2].set_title(f'{team_home} - {team_away} Second Half Corner Kick' )
+    ax[0,2].set_title(f'{team_home} - {team_away} Second Half Corner Kick (ST= Second Time)')
     ax[0,2].set_ylabel('Count')
     ax[0,2].set_ylim(0, df_aralarinda_corner['corner_kick_total_secondhalf'].max() + 3) 
     ax[0,2].set_xticks(x_length + width )
-    ax[0,2].set_xticklabels(corner_dates, rotation= 45, ha= 'right', fontsize= 7)
+    ax[0,2].set_xticklabels(xticks_labels, rotation= 45, ha= 'right', fontsize= 7)
     #------ax[1,0]------  ARALARINDAKI KORNER ------------
     df_aralarinda_corner_all = df[(df.home_team.str.contains(away_team)) & (df.away_team.str.contains(home_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df[(df.home_team.str.contains(away_team)) & (df.away_team.str.contains(home_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total','corner_kicks_home','corner_kicks_away']][:10]
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
-    x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
+    home_goal = list(df_aralarinda_corner_all['home_goal'][:10])
+    away_goal = list(df_aralarinda_corner_all['away_goal'][:10])
+    red_card = list(df_aralarinda_corner_all['red_cards_total'][:10])
+    xticks_labels = [f"{date}\nFT: {home_goal} - {away_goal} / R: {red_card}" for date, home_goal, away_goal, red_card in zip(corner_dates, home_goal, away_goal, red_card)]
+    x_length = np.arange(len(corner_dates))
     for column in df_aralarinda_corner.columns : 
         offset = width * multiplier
         rects = ax[1,0].bar(x_length + offset, df_aralarinda_corner[column], width, label = column)
         ax[1,0].bar_label(rects, padding=3)
         multiplier += 1
     ax[1,0].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-    ax[1,0].set_title(f'{team_away} - {team_home} Corner Kick' )
+    ax[1,0].set_title(f'{team_home} - {team_away} Corner Kick (FT= Full Time, R= Red)' )
     ax[1,0].set_ylabel('Count')
     ax[1,0].set_ylim(0, df_aralarinda_corner['corner_kick_total'].max() + 3) 
     ax[1,0].set_xticks(x_length + width )
-    ax[1,0].set_xticklabels(corner_dates, rotation= 45, ha= 'right', fontsize= 7)
+    ax[1,0].set_xticklabels(xticks_labels, rotation= 45, ha= 'right', fontsize= 7)
     #------ax[1,1]------  ARALARINDAKI KORNER FIRST HALF ------------
     df_aralarinda_corner_all = df[(df.home_team.str.contains(away_team)) & (df.away_team.str.contains(home_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df[(df.home_team.str.contains(away_team)) & (df.away_team.str.contains(home_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_firsthalf','corner_kicks_home_firsthalf','corner_kicks_away_firsthalf']][:10]
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
-    x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
+
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
+    home_iy_goal = list(df_aralarinda_corner_all['home_iy_goal'][:10])
+    away_iy_goal = list(df_aralarinda_corner_all['away_iy_goal'][:10])
+    red_cards_firsthalf = list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:10])
+    xticks_labels = [f"{date}\nHT: {home_iy_goal} - {away_iy_goal} / R: {red_card}" for date, home_iy_goal, away_iy_goal, red_card in zip(corner_dates, home_iy_goal, away_iy_goal, red_cards_firsthalf)]
+    x_length = np.arange(len(corner_dates))
     for column in df_aralarinda_corner.columns : 
         offset = width * multiplier
         rects = ax[1,1].bar(x_length + offset, df_aralarinda_corner[column], width, label = column)
         ax[1,1].bar_label(rects, padding=3)
         multiplier += 1
     ax[1,1].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-    ax[1,1].set_title(f'{team_away} - {team_home} First Half Corner Kick' )
+    ax[1,1].set_title(f'{team_home} - {team_away} First Half Corner Kick (HT= Half Time)')    
     ax[1,1].set_ylabel('Count')
     ax[1,1].set_ylim(0, df_aralarinda_corner['corner_kick_total_firsthalf'].max() + 3) 
     ax[1,1].set_xticks(x_length + width )
-    ax[1,1].set_xticklabels(corner_dates, rotation= 45, ha= 'right', fontsize= 7)
+    ax[1,1].set_xticklabels(xticks_labels, rotation= 45, ha= 'right', fontsize= 7)
     #------ax[1,2]------  ARALARINDAKI KORNER SECOND HALF ------------
     df_aralarinda_corner_all = df[(df.home_team.str.contains(away_team)) & (df.away_team.str.contains(home_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df[(df.home_team.str.contains(away_team)) & (df.away_team.str.contains(home_team))].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf']][:10]
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
-    x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
     corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
+    home_sh_goal = list(df_aralarinda_corner_all['home_sh_goal'][:10])
+    away_sh_goal = list(df_aralarinda_corner_all['away_sh_goal'][:10])
+    red_cards_secondhalf = list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:10])
+    xticks_labels = [f"{date}\nST: {home_sh_goal} - {away_sh_goal} / R: {red_card}" for date, home_sh_goal, away_sh_goal, red_card in zip(corner_dates, home_sh_goal, away_sh_goal, red_cards_secondhalf)]
+    x_length = np.arange(len(corner_dates))
     for column in df_aralarinda_corner.columns : 
         offset = width * multiplier
         rects = ax[1,2].bar(x_length + offset, df_aralarinda_corner[column], width, label = column)
         ax[1,2].bar_label(rects, padding=3)
         multiplier += 1
     ax[1,2].legend(loc='upper right', ncols= 3, fontsize= 7,  bbox_to_anchor=(1, 1))
-    ax[1,2].set_title(f'{team_away} - {team_home} Second Half Corner Kick' )
+    ax[1,2].set_title(f'{team_home} - {team_away} Second Half Corner Kick (ST= Second Time)')
     ax[1,2].set_ylabel('Count')
     ax[1,2].set_ylim(0, df_aralarinda_corner['corner_kick_total_secondhalf'].max() + 3) 
     ax[1,2].set_xticks(x_length + width )
-    ax[1,2].set_xticklabels(corner_dates, rotation= 45, ha= 'right', fontsize= 7)
+    ax[1,2].set_xticklabels(xticks_labels, rotation= 45, ha= 'right', fontsize= 7)
 
     fig.suptitle("Corner Kicks Overview", fontsize=16, y=1.02)
     #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -174,10 +201,11 @@ def corner(
     df_aralarinda_corner = df[df.home_team.str.contains(home_team)].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total','corner_kicks_home','corner_kicks_away']][:20]
     corner_dates = list(df_aralarinda_corner_all['date'][:20].astype(str))  # Tarihleri string olarak alıyoruz
+    red_cards = list(df_aralarinda_corner_all['red_cards_total'][:20])
     away_teams = list(df_aralarinda_corner_all['away_team'][:20])
     place_away = list(df_aralarinda_corner_all['place_away'][:20])
     match_round = list(df_aralarinda_corner_all['match_round'][:20])
-    xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, away_teams, place_away, match_round)]
+    xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, red, place, round in zip(corner_dates, away_teams, red_cards, place_away, match_round)]
     x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -203,10 +231,11 @@ def corner(
     df_aralarinda_corner = df[df.home_team.str.contains(home_team)].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_firsthalf','corner_kicks_home_firsthalf','corner_kicks_away_firsthalf']][:20]
     corner_dates = list(df_aralarinda_corner_all['date'][:20].astype(str))  # Tarihleri string olarak alıyoruz
+    red_cards_firsthalf= list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:20])
     away_teams = list(df_aralarinda_corner_all['away_team'][:20])
     place_away = list(df_aralarinda_corner_all['place_away'][:20])
     match_round = list(df_aralarinda_corner_all['match_round'][:20])
-    xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, away_teams, place_away, match_round)]
+    xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, red, place, round in zip(corner_dates, away_teams, red_cards, place_away, match_round)]
     x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -232,10 +261,11 @@ def corner(
     df_aralarinda_corner = df[df.home_team.str.contains(home_team)].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf']][:20]
     corner_dates = list(df_aralarinda_corner_all['date'][:20].astype(str))  # Tarihleri string olarak alıyoruz
+    red_cards_secondhalf= list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:20])
     away_teams = list(df_aralarinda_corner_all['away_team'][:20])
     place_away = list(df_aralarinda_corner_all['place_away'][:20])
     match_round = list(df_aralarinda_corner_all['match_round'][:20])
-    xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, away_teams, place_away, match_round)]
+    xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, red, place, round in zip(corner_dates, away_teams, red_cards, place_away, match_round)]
     x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -261,10 +291,11 @@ def corner(
     df_aralarinda_corner = df[df.away_team.str.contains(away_team)].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total','corner_kicks_home','corner_kicks_away']][:20]
     corner_dates = list(df_aralarinda_corner_all['date'][:20].astype(str))  # Tarihleri string olarak alıyoruz
+    red_cards = list(df_aralarinda_corner_all['red_cards_total'][:20])
     home_teams = list(df_aralarinda_corner_all['home_team'][:20])
     place_home = list(df_aralarinda_corner_all['place_home'][:20])
     match_round = list(df_aralarinda_corner_all['match_round'][:20])
-    xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, home_teams, place_home, match_round)]
+    xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, red, place, round in zip(corner_dates, home_teams, red_cards, place_home, match_round)]
     x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -290,10 +321,11 @@ def corner(
     df_aralarinda_corner = df[df.away_team.str.contains(away_team)].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_firsthalf','corner_kicks_home_firsthalf','corner_kicks_away_firsthalf']][:20]
     corner_dates = list(df_aralarinda_corner_all['date'][:20].astype(str))  # Tarihleri string olarak alıyoruz
+    red_cards_firsthalf= list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:20])
     home_teams = list(df_aralarinda_corner_all['home_team'][:20])
     place_home = list(df_aralarinda_corner_all['place_home'][:20])
     match_round = list(df_aralarinda_corner_all['match_round'][:20])
-    xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, home_teams, place_home, match_round)]
+    xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, red, place, round in zip(corner_dates, home_teams, red_cards, place_home, match_round)]
     x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -319,10 +351,11 @@ def corner(
     df_aralarinda_corner = df[df.away_team.str.contains(away_team)].sort_values(by= 'date', ascending= False)
     df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf']][:20]
     corner_dates = list(df_aralarinda_corner_all['date'][:20].astype(str))  # Tarihleri string olarak alıyoruz
+    red_cards_secondhalf= list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:20])
     home_teams = list(df_aralarinda_corner_all['home_team'][:20])
     place_home = list(df_aralarinda_corner_all['place_home'][:20])
     match_round = list(df_aralarinda_corner_all['match_round'][:20])
-    xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, home_teams, place_home, match_round)]
+    xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, red, place, round in zip(corner_dates, home_teams, red_cards, place_home, match_round)]
     x_length = np.arange(len(corner_dates))
     width = 0.25  # the width of the bars
     multiplier = 0
@@ -353,7 +386,8 @@ def corner(
         df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total','corner_kicks_home','corner_kicks_away']][:10]
         corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
         away_teams = list(df_aralarinda_corner_all['away_team'][:10])
-        xticks_labels = [f"{date}\n{team}" for date, team in zip(corner_dates, away_teams)]
+        red_cards= list(df_aralarinda_corner_all['red_cards_total'][:10])
+        xticks_labels = [f"{date}\n{team} - R:{red}" for date, team, red in zip(corner_dates, away_teams, red_cards)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -380,7 +414,8 @@ def corner(
         df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_firsthalf','corner_kicks_home_firsthalf','corner_kicks_away_firsthalf']][:10]
         corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
         away_teams = list(df_aralarinda_corner_all['away_team'][:10])
-        xticks_labels = [f"{date}\n{team}" for date, team in zip(corner_dates, away_teams)]
+        red_cards_firsthalf= list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:10])
+        xticks_labels = [f"{date}\n{team} - R:{red}" for date, team, red in zip(corner_dates, away_teams, red_cards_firsthalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -407,7 +442,8 @@ def corner(
         df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf']][:10]
         corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
         away_teams = list(df_aralarinda_corner_all['away_team'][:10])
-        xticks_labels = [f"{date}\n{team}" for date, team in zip(corner_dates, away_teams)]
+        red_cards_secondhalf= list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:10])
+        xticks_labels = [f"{date}\n{team} - R:{red}" for date, team, red in zip(corner_dates, away_teams, red_cards_secondhalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -434,7 +470,8 @@ def corner(
         df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total','corner_kicks_home','corner_kicks_away']][:10]
         corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
         home_teams = list(df_aralarinda_corner_all['home_team'][:10])
-        xticks_labels = [f"{date}\n{team}" for date, team in zip(corner_dates, home_teams)]
+        red_cards= list(df_aralarinda_corner_all['red_cards_total'][:10])
+        xticks_labels = [f"{date}\n{team} - R:{red}" for date, team, red in zip(corner_dates, home_teams, red_cards)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -461,7 +498,8 @@ def corner(
         df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_firsthalf','corner_kicks_home_firsthalf','corner_kicks_away_firsthalf']][:10]
         corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
         home_teams = list(df_aralarinda_corner_all['home_team'][:10])
-        xticks_labels = [f"{date}\n{team}" for date, team in zip(corner_dates, home_teams)]
+        red_cards_firsthalf= list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:10])
+        xticks_labels = [f"{date}\n{team} - R:{red}" for date, team, red in zip(corner_dates, home_teams, red_cards_firsthalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -488,7 +526,8 @@ def corner(
         df_aralarinda_corner = df_aralarinda_corner[['corner_kick_total_secondhalf','corner_kicks_home_secondhalf','corner_kicks_away_secondhalf']][:10]
         corner_dates = list(df_aralarinda_corner_all['date'][:10].astype(str))  # Tarihleri string olarak alıyoruz
         home_teams = list(df_aralarinda_corner_all['home_team'][:10])
-        xticks_labels = [f"{date}\n{team}" for date, team in zip(corner_dates, home_teams)]
+        red_cards_secondhalf= list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:10])
+        xticks_labels = [f"{date}\n{team} - R:{red}" for date, team, red in zip(corner_dates, home_teams, red_cards_secondhalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -523,7 +562,8 @@ def corner(
         away_teams = list(df_aralarinda_corner_all['away_team'][:10])
         place_away = list(df_aralarinda_corner_all['place_away'][:10])
         match_round = list(df_aralarinda_corner_all['match_round'][:10])
-        xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, away_teams, place_away, match_round)]
+        red_cards= list(df_aralarinda_corner_all['red_cards_total'][:10])
+        xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, place, round, red in zip(corner_dates, away_teams, place_away, match_round, red_cards)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -552,7 +592,8 @@ def corner(
         away_teams = list(df_aralarinda_corner_all['away_team'][:10])
         place_away = list(df_aralarinda_corner_all['place_away'][:10])
         match_round = list(df_aralarinda_corner_all['match_round'][:10])
-        xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, away_teams, place_away, match_round)]
+        red_cards_firsthalf= list(df_aralarinda_corner_all['red_cards_firsthalf_total'][:10])
+        xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, place, round, red in zip(corner_dates, away_teams, place_away, match_round, red_cards_firsthalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -581,7 +622,8 @@ def corner(
         away_teams = list(df_aralarinda_corner_all['away_team'][:10])
         place_away = list(df_aralarinda_corner_all['place_away'][:10])
         match_round = list(df_aralarinda_corner_all['match_round'][:10])
-        xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, away_teams, place_away, match_round)]
+        red_cards_secondhalf= list(df_aralarinda_corner_all['red_cards_secondhalf_total'][:10])
+        xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, place, round, red in zip(corner_dates, away_teams, place_away, match_round, red_cards_secondhalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -610,7 +652,8 @@ def corner(
         home_teams = list(df_aralarinda_corner_all['home_team'][:10])
         place_home = list(df_aralarinda_corner_all['place_home'][:10])
         match_round = list(df_aralarinda_corner_all['match_round'][:10])
-        xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, home_teams, place_home, match_round)]
+        red_cards= list(df_aralarinda_corner_all['red_cards_total'][:10])
+        xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, place, round, red in zip(corner_dates, home_teams, place_home, match_round, red_cards)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -639,7 +682,8 @@ def corner(
         home_teams = list(df_aralarinda_corner_all['home_team'][:10])
         place_home = list(df_aralarinda_corner_all['place_home'][:10])
         match_round = list(df_aralarinda_corner_all['match_round'][:10])
-        xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, home_teams, place_home, match_round)]
+        red_cards_firsthalf= list(df_aralarinda_corner_all['red_cards_total'][:10])
+        xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, place, round, red in zip(corner_dates, home_teams, place_home, match_round, red_cards_firsthalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
@@ -668,7 +712,8 @@ def corner(
         home_teams = list(df_aralarinda_corner_all['home_team'][:10])
         place_home = list(df_aralarinda_corner_all['place_home'][:10])
         match_round = list(df_aralarinda_corner_all['match_round'][:10])
-        xticks_labels = [f"{date}\n{team}\nw:{round} - p:{place}" for date, team, place, round in zip(corner_dates, home_teams, place_home, match_round)]
+        red_cards_secondhalf= list(df_aralarinda_corner_all['red_cards_total'][:10])
+        xticks_labels = [f"{date}\n{team}\nw:{round}-p:{place}-R:{red}" for date, team, place, round, red in zip(corner_dates, home_teams, place_home, match_round, red_cards_secondhalf)]
         x_length = np.arange(len(corner_dates))
         width = 0.25  # the width of the bars
         multiplier = 0
